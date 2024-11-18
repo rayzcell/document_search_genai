@@ -64,27 +64,35 @@ def query_ai_model(question, relevant_chunk):
 
 
 
+
+# Function to log and commit to Git
 def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
     try:
-        # Log the user query to the file
+        # Log the query into the file
         with open(log_file, "a") as file:
             file.write(f"Email: {email}, Query: {query}\n")
         
-        os.system('git config --global user.email "rayeesafzal@hotmail.com"')
-        os.system('git config --global user.name "rayeesahmad"')
-        # Stage the modified file
+        # Configure Git
+        os.system('git config --global user.email "your-email@example.com"')
+        os.system('git config --global user.name "your-username"')
+
+        # Use the GitHub token for authentication
+        #github_token = os.getenv("github_token")
+        github_token = st.secrets["github"]["token"]
+        if not github_token:
+            raise ValueError("GitHub token not found in secrets.")
+
+        repo_url = f"https://{github_token}@https://github.com/rayzcell/document_search_genai.git"
+        subprocess.run(["git", "remote", "set-url", "origin", repo_url], check=True)
+
+        # Stage, commit, and push
         subprocess.run(["git", "add", log_file], check=True)
-        
-        # Commit the changes
-        commit_message = f"Logged query from {email}"
-        subprocess.run(["git", "commit", "-m", commit_message], check=True)
-        
-        # Push the changes to the repository
+        subprocess.run(["git", "commit", "-m", f"Logged query from {email}"], check=True)
         subprocess.run(["git", "push"], check=True)
-        
-        print("Query logged and committed successfully.")
+
+        print("Query logged and committed to Git successfully.")
     except subprocess.CalledProcessError as e:
-        print(f"Git command failed: {e}")
+        print(f"Git error: {e}")
     except Exception as e:
         print(f"An error occurred: {e}")
 
