@@ -82,7 +82,8 @@ def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
         if not github_token:
             raise ValueError("GitHub token not found in secrets.")
 
-        repo_url = f"{github_token}@github.com/rayzcell/document_search_genai.git"
+        repo_url = f"https://{github_token}@github.com/rayzcell/your-repo.git"
+
         subprocess.run(["git", "remote", "set-url", "origin", repo_url], check=True)
 
         # Stage, commit, and push
