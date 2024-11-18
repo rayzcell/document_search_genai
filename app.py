@@ -77,8 +77,8 @@ def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
         os.system('git config --global user.name "your-username"')
 
         # Use the GitHub token for authentication
-        #github_token = os.getenv("github_token")
-        github_token = st.secrets["github"]["token"]
+        github_token = os.getenv("github_token")
+        #github_token = st.secrets["github"]["token"]
         if not github_token:
             raise ValueError("GitHub token not found in secrets.")
 
