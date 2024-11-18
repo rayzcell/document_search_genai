@@ -66,23 +66,31 @@ def query_ai_model(question, relevant_chunk):
 
 
 # Function to log and commit to Git
+import os
+import subprocess
+import streamlit as st
+
 def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
     try:
         # Log the query into the file
         with open(log_file, "a") as file:
             file.write(f"Email: {email}, Query: {query}\n")
         
-        # Configure Git
-        os.system('git config --global user.email "rayeesafzal@hotmail.com"')
-        os.system('git config --global user.name "rayzcell"')
-
         # Get the GitHub token from Streamlit secrets
         github_token = st.secrets["github"]["token"]
         if not github_token:
             raise ValueError("GitHub token not found in secrets.")
 
-        # Set the Git remote URL with the token
-        repo_url = f"https://{github_token}@github.com/rayzcell/document_search_genai.git"
+        # Set environment variable for Git authentication
+        os.environ['GIT_ASKPASS'] = 'echo'
+        os.environ['GIT_PASSWORD'] = github_token
+
+        # Configure Git
+        os.system('git config --global user.email "rayeesafzal@hotmail.com"')
+        os.system('git config --global user.name "rayzcell"')
+
+        # Set the Git remote URL without the token
+        repo_url = "https://github.com/rayzcell/document_search_genai.git"
         subprocess.run(["git", "remote", "set-url", "origin", repo_url], check=True)
 
         # Stage, commit, and push the changes
@@ -95,7 +103,6 @@ def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
         print(f"Git error: {e}")
     except Exception as e:
         print(f"An error occurred: {e}")
-
 
 # Log unanswered queries
 def log_unanswered_query(email, question):
