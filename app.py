@@ -7,7 +7,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from huggingface_hub import login, HfApi
 
 # Configuration for API
-API_KEY = os.getenv("openai_key")
+API_KEY = st.secrets["openai"]["api_key"]
 ENDPOINT = "https://rayee-m3lv0e7b-westeurope.openai.azure.com/openai/deployments/gpt-4/chat/completions?api-version=2024-02-15-preview"
 HEADERS = {
     "Content-Type": "application/json",
@@ -18,7 +18,7 @@ HEADERS = {
 FILE_PATH = "Synopsis_text.docx"  # Replace with the correct document path
 LOG_FILE = "user_queries_log.txt"  # File to log unanswered queries
 
-api_token = os.getenv("api_token")
+api_token = st.secrets["huggingface"]["api_token"]
 if api_token is None:
     st.error("Hugging Face API Key not found. Please set it in the Secrets Manager.")
 else:
