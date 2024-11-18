@@ -76,18 +76,16 @@ def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
         os.system('git config --global user.email "rayeesafzal@hotmail.com"')
         os.system('git config --global user.name "rayzcell"')
 
-        # Use the GitHub token for authentication
-        #github_token = os.getenv("github_token")
+        # Get the GitHub token from Streamlit secrets
         github_token = st.secrets["github"]["token"]
         if not github_token:
             raise ValueError("GitHub token not found in secrets.")
 
-        repo_url = "https://github.com/rayzcell/document_search_genai.git"
-        print(repo_url)
-        print(github_token)
+        # Set the Git remote URL with the token
+        repo_url = f"https://{github_token}@github.com/rayzcell/document_search_genai.git"
         subprocess.run(["git", "remote", "set-url", "origin", repo_url], check=True)
 
-        # Stage, commit, and push
+        # Stage, commit, and push the changes
         subprocess.run(["git", "add", log_file], check=True)
         subprocess.run(["git", "commit", "-m", f"Logged query from {email}"], check=True)
         subprocess.run(["git", "push"], check=True)
@@ -97,6 +95,7 @@ def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
         print(f"Git error: {e}")
     except Exception as e:
         print(f"An error occurred: {e}")
+
 
 # Log unanswered queries
 def log_unanswered_query(email, question):
