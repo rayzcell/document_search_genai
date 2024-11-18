@@ -70,15 +70,40 @@ def save_and_commit():
         repo_type="space",
         token=api_token
     )
+import os
+import subprocess
+
+def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
+    try:
+        # Log the user query to the file
+        with open(log_file, "a") as file:
+            file.write(f"Email: {email}, Query: {query}\n")
+        
+        os.system('git config --global user.email "rayeesafzal@hotmail.com"')
+        os.system('git config --global user.name "rayeesahmad"')
+        # Stage the modified file
+        subprocess.run(["git", "add", log_file], check=True)
+        
+        # Commit the changes
+        commit_message = f"Logged query from {email}"
+        subprocess.run(["git", "commit", "-m", commit_message], check=True)
+        
+        # Push the changes to the repository
+        subprocess.run(["git", "push"], check=True)
+        
+        print("Query logged and committed successfully.")
+    except subprocess.CalledProcessError as e:
+        print(f"Git command failed: {e}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 # Log unanswered queries
 def log_unanswered_query(email, question):
     try:
-        with open(LOG_FILE, "a") as log_file:
-            log_file.write(f"Email: {email}, Query: {question}\n")
-        save_and_commit()
+        log_and_commit_to_git(email, question)
+        print("Query logged and committed to Git.")
     except Exception as e:
-        st.error(f"Error while logging the query: {e}")
+        print(f"Error while logging the query: {e}")
 
 # Streamlit app layout
 st.title("Project Synopsis QA System")
