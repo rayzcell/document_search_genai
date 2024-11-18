@@ -73,8 +73,8 @@ def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
             file.write(f"Email: {email}, Query: {query}\n")
         
         # Configure Git
-        os.system('git config --global user.email "your-email@example.com"')
-        os.system('git config --global user.name "your-username"')
+        os.system('git config --global user.email "rayeesafzal@hotmail.com"')
+        os.system('git config --global user.name "rayzcell"')
 
         # Use the GitHub token for authentication
         github_token = os.getenv("github_token")
@@ -82,7 +82,7 @@ def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
         if not github_token:
             raise ValueError("GitHub token not found in secrets.")
 
-        repo_url = f"https://{github_token}@github.com/rayzcell/your-repo.git"
+        repo_url = f"https://{github_token}@github.com/rayzcell/document_search_genai.git"
 
         subprocess.run(["git", "remote", "set-url", "origin", repo_url], check=True)
 
