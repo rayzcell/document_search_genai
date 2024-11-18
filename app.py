@@ -5,7 +5,8 @@ from docx import Document
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from huggingface_hub import login, HfApi
-
+import os
+import subprocess
 # Configuration for API
 API_KEY = st.secrets["openai"]["api_key"]
 ENDPOINT = "https://rayee-m3lv0e7b-westeurope.openai.azure.com/openai/deployments/gpt-4/chat/completions?api-version=2024-02-15-preview"
@@ -61,17 +62,7 @@ def query_ai_model(question, relevant_chunk):
         return f"Error while querying the AI: {':'.join(str(e).split(':')[:2])}"
     return answer
 
-def save_and_commit():
-    api = HfApi()
-    api.upload_file(
-        path_or_fileobj=LOG_FILE,
-        path_in_repo="user_queries_log.txt",
-        repo_id="rayeesahmad/document_interaction-app2",
-        repo_type="space",
-        token=api_token
-    )
-import os
-import subprocess
+
 
 def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
     try:
