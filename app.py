@@ -70,6 +70,10 @@ import os
 import subprocess
 import streamlit as st
 
+import os
+import subprocess
+import streamlit as st
+
 def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
     try:
         # Log the query into the file
@@ -81,15 +85,16 @@ def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
         if not github_token:
             raise ValueError("GitHub token not found in secrets.")
 
-        # Set environment variable for Git authentication
-        os.environ['GIT_ASKPASS'] = 'echo'
-        os.environ['GIT_PASSWORD'] = github_token
+        # Set up Git credentials
+        os.environ['GIT_ASKPASS'] = 'echo'  # Disable password prompt
+        os.environ['GIT_USERNAME'] = 'rayzcell'  # Your GitHub username
+        os.environ['GIT_PASSWORD'] = github_token  # GitHub token for authentication
 
-        # Configure Git
+        # Configure Git (Optional step)
         os.system('git config --global user.email "rayeesafzal@hotmail.com"')
         os.system('git config --global user.name "rayzcell"')
 
-        # Set the Git remote URL without the token
+        # Set the remote repository URL (no token in URL directly)
         repo_url = "https://github.com/rayzcell/document_search_genai.git"
         subprocess.run(["git", "remote", "set-url", "origin", repo_url], check=True)
 
