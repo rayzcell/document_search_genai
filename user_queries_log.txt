@@ -1,12 +1,2 @@
-Email: sew, Query: mbq
-Email: sek, Query: mbq
-Email: sam, Query: mbq
-Email: sam, Query: mbq
-Email: somehting, Query: jglkjds
-Email: somehting, Query: jglkjds
-Email: dslfjd, Query: slfj
-Email: somehting, Query: jglkjds
-Email: dslfjd, Query: slfj
-Email: hj, Query: slfj
-Email: hj, Query: slfj
-Email: ahil@hotmail.com, Query: something not found
+2024-11-19 19:15:12,795 - Email: fjddfd, Query: jdlkdj
+2024-11-19 19:20:06,924 - Email: ahil@gmail.com, Query: somehting not found

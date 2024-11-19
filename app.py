@@ -100,6 +100,43 @@ def log_and_trigger_action(email, query, log_file="user_queries_log.txt"):
 import os
 import subprocess
 import streamlit as st
+import logging
+import streamlit as st
+
+# Set up logging to a file (permanent logging)
+log_file = "user_queries_log.txt"
+logging.basicConfig(
+    filename=log_file,  # Log to file
+    level=logging.INFO,  # Set logging level
+    format="%(asctime)s - %(message)s",  # Log format
+    filemode="a",  # Append to the log file
+)
+
+# Create a logger instance
+logger = logging.getLogger()
+
+# Function to log email and query
+def log_query(email, query):
+    try:
+        # Log the query to both Streamlit and the log file
+        logger.info(f"Email: {email}, Query: {query}")  # Log to file
+        #st.write(f"Query from {email}: {query}")  # Optionally display in Streamlit
+        
+        # Optionally, log to Streamlit's console as well
+        #st.success("Query logged successfully!")
+        
+    except Exception as e:
+        logger.error(f"Error while logging query: {e}")
+        st.error(f"An error occurred while logging the query: {e}")
+def display_logs(log_file="user_queries_log.txt"):
+    try:
+        with open(log_file, "r") as file:
+            logs = file.read()
+            st.text_area("Query Logs", logs, height=300)  # Display logs in a text area
+    except Exception as e:
+        st.error(f"Error reading log file: {e}")
+
+
 
 def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
     try:
@@ -144,7 +181,7 @@ def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
 # Log unanswered queries
 def log_unanswered_query(email, question):
     try:
-        log_and_commit_to_git(email, question)
+        log_query(email, question)
         print("Query logged and committed to Git.")
     except Exception as e:
         print(f"Error while logging the query: {e}")
@@ -176,3 +213,5 @@ if st.button("Submit"):
             # Query the AI model
             answer = query_ai_model(question, relevant_chunk)
             st.success(answer)
+if st.button('logs'):
+    display_logs()
