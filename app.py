@@ -75,22 +75,28 @@ import subprocess
 import streamlit as st
 github_token = st.secrets["github"]["token"]
 
-def trigger_github_action():
-    url = "https://api.github.com/repos/rayzcell/document_search_genai/dispatches"
+import requests
+
+def log_and_trigger_action(email, query, log_file="user_queries_log.txt"):
+  try:
+    # Log the query into memory (Optional, can be done in Streamlit app)
+    log_data = f"Email: {email}, Query: {query}\n"
+
+    # Trigger GitHub Action with log data
+    url = "https://raw.githubusercontent.com/rayzcell/document_search_genai/main/user_queries_log.txt"  # Replace with your endpoint
     headers = {
+        "Content-Type": "application/json",
         "Authorization": f"token {github_token} "
     }
-    data = {
-        "event_type": "update_repo"
-    }
+    data = {"log_data": log_data}
 
     response = requests.post(url, headers=headers, json=data)
-    if response.status_code == 204:
-        print("GitHub Action triggered successfully!")
+    if response.status_code == 200:
+        print("Log data sent to GitHub Action successfully.")
     else:
-        print("Failed to trigger GitHub Action. Error:", response.text)
-
-
+        print(f"Failed to trigger GitHub Action. Error: {response.text}")
+  except Exception as e:
+    print(f"An error occurred: {e}")
 import os
 import subprocess
 import streamlit as st
@@ -134,7 +140,7 @@ def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
 # Log unanswered queries
 def log_unanswered_query(email, question):
     try:
-        log_and_commit_to_git(email, question)
+        log_and_trigger_action(email, question)
         print("Query logged and committed to Git.")
     except Exception as e:
         print(f"Error while logging the query: {e}")
