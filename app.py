@@ -73,6 +73,27 @@ import streamlit as st
 import os
 import subprocess
 import streamlit as st
+github_token = st.secrets["github"]["token"]
+
+def trigger_github_action():
+    url = "https://api.github.com/repos/rayzcell/document_search_genai/dispatches"
+    headers = {
+        "Authorization": f"token {github_token} "
+    }
+    data = {
+        "event_type": "update_repo"
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+    if response.status_code == 204:
+        print("GitHub Action triggered successfully!")
+    else:
+        print("Failed to trigger GitHub Action. Error:", response.text)
+
+
+import os
+import subprocess
+import streamlit as st
 
 def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
     try:
