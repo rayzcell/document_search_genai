@@ -129,7 +129,7 @@ def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
         print(f"Git error: {e}")
     except Exception as e:
         print(f"An error occurred: {e}")
-        st.warning(e
+        st.warning(e)
 
 # Log unanswered queries
 def log_unanswered_query(email, question):
