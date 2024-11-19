@@ -5,7 +5,8 @@ from docx import Document
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from huggingface_hub import login, HfApi
-
+import os
+import subprocess
 # Configuration for API
 API_KEY = st.secrets["openai"]["api_key"]
 ENDPOINT = "https://rayee-m3lv0e7b-westeurope.openai.azure.com/openai/deployments/gpt-4/chat/completions?api-version=2024-02-15-preview"
@@ -61,46 +62,85 @@ def query_ai_model(question, relevant_chunk):
         return f"Error while querying the AI: {':'.join(str(e).split(':')[:2])}"
     return answer
 
-def save_and_commit():
-    api = HfApi()
-    api.upload_file(
-        path_or_fileobj=LOG_FILE,
-        path_in_repo="user_queries_log.txt",
-        repo_id="rayeesahmad/document_interaction-app2",
-        repo_type="space",
-        token=api_token
-    )
+
+
+
+# Function to log and commit to Git
 import os
 import subprocess
+import streamlit as st
+
+import os
+import subprocess
+import streamlit as st
+github_token = st.secrets["github"]["token"]
+
+import requests
+
+def log_and_trigger_action(email, query, log_file="user_queries_log.txt"):
+  try:
+    # Log the query into memory (Optional, can be done in Streamlit app)
+    log_data = f"Email: {email}, Query: {query}\n"
+
+    # Trigger GitHub Action with log data
+    url = "https://raw.githubusercontent.com/rayzcell/document_search_genai/main/user_queries_log.txt"  # Replace with your endpoint
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"token {github_token} "
+    }
+    data = {"log_data": log_data}
+
+    response = requests.post(url, headers=headers, json=data)
+    if response.status_code == 200:
+        print("Log data sent to GitHub Action successfully.")
+    else:
+        print(f"Failed to trigger GitHub Action. Error: {response.text}")
+  except Exception as e:
+    print(f"An error occurred: {e}")
+import os
+import subprocess
+import streamlit as st
 
 def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
     try:
-        # Log the user query to the file
+        # Log the query into the file
         with open(log_file, "a") as file:
             file.write(f"Email: {email}, Query: {query}\n")
         
+        # Get the GitHub token from Streamlit secrets
+        github_token = st.secrets["github"]["token"]
+        if not github_token:
+            raise ValueError("GitHub token not found in secrets.")
+
+        # Set up Git credentials
+        os.environ['GIT_ASKPASS'] = 'echo'  # Disable password prompt
+        os.environ['GIT_USERNAME'] = 'rayzcell'  # Your GitHub username
+        os.environ['GIT_PASSWORD'] = github_token  # GitHub token for authentication
+
+        # Configure Git (Optional step)
         os.system('git config --global user.email "rayeesafzal@hotmail.com"')
-        os.system('git config --global user.name "rayeesahmad"')
-        # Stage the modified file
+        os.system('git config --global user.name "rayzcell"')
+
+        # Set the remote repository URL (no token in URL directly)
+        repo_url = "https://github.com/rayzcell/document_search_genai.git"
+        subprocess.run(["git", "remote", "set-url", "origin", repo_url], check=True)
+
+        # Stage, commit, and push the changes
         subprocess.run(["git", "add", log_file], check=True)
-        
-        # Commit the changes
-        commit_message = f"Logged query from {email}"
-        subprocess.run(["git", "commit", "-m", commit_message], check=True)
-        
-        # Push the changes to the repository
+        subprocess.run(["git", "commit", "-m", f"Logged query from {email}"], check=True)
         subprocess.run(["git", "push"], check=True)
-        
-        print("Query logged and committed successfully.")
+
+        print("Query logged and committed to Git successfully.")
     except subprocess.CalledProcessError as e:
-        print(f"Git command failed: {e}")
+        print(f"Git error: {e}")
     except Exception as e:
         print(f"An error occurred: {e}")
+        st.warning(e)
 
 # Log unanswered queries
 def log_unanswered_query(email, question):
     try:
-        log_and_commit_to_git(email, question)
+        log_and_trigger_action(email, question)
         print("Query logged and committed to Git.")
     except Exception as e:
         print(f"Error while logging the query: {e}")
