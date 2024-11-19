@@ -117,6 +117,45 @@ def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
         os.environ['GIT_USERNAME'] = 'rayzcell'  # Your GitHub username
         os.environ['GIT_PASSWORD'] = github_token  # GitHub token for authentication
 
+        # Configure Git
+        os.system('git config --global user.email "rayeesafzal@hotmail.com"')
+        os.system('git config --global user.name "rayzcell"')
+
+        # Set the remote repository URL
+        repo_url = "https://github.com/rayzcell/document_search_genai.git"
+        subprocess.run(["git", "remote", "set-url", "origin", repo_url], check=True)
+
+        # Stage and commit the current changes
+        subprocess.run(["git", "add", log_file], check=True)
+        subprocess.run(["git", "commit", "-m", f"Logged query from {email}"], check=True)
+
+        # Pull remote changes with rebase
+        subprocess.run(["git", "pull", "--rebase"], check=True)
+
+        # Push the updated branch to the remote repository
+        subprocess.run(["git", "push"], check=True)
+
+        print("Query logged and committed to Git successfully.")
+    except subprocess.CalledProcessError as e:
+        print(f"Git error: {e}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        st.warning(e)
+    try:
+        # Log the query into the file
+        with open(log_file, "a") as file:
+            file.write(f"Email: {email}, Query: {query}\n")
+        
+        # Get the GitHub token from Streamlit secrets
+        github_token = st.secrets["github"]["token"]
+        if not github_token:
+            raise ValueError("GitHub token not found in secrets.")
+
+        # Set up Git credentials
+        os.environ['GIT_ASKPASS'] = 'echo'  # Disable password prompt
+        os.environ['GIT_USERNAME'] = 'rayzcell'  # Your GitHub username
+        os.environ['GIT_PASSWORD'] = github_token  # GitHub token for authentication
+
         # Configure Git (Optional step)
         os.system('git config --global user.email "rayeesafzal@hotmail.com"')
         os.system('git config --global user.name "rayzcell"')
@@ -124,6 +163,8 @@ def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
         # Set the remote repository URL (no token in URL directly)
         repo_url = "https://github.com/rayzcell/document_search_genai.git"
         subprocess.run(["git", "remote", "set-url", "origin", repo_url], check=True)
+        
+        subprocess.run(["git", "pull", "--rebase"], check=True)  # Rebase to avoid merge commits
 
         # Stage, commit, and push the changes
         subprocess.run(["git", "add", log_file], check=True)
@@ -140,7 +181,7 @@ def log_and_commit_to_git(email, query, log_file="user_queries_log.txt"):
 # Log unanswered queries
 def log_unanswered_query(email, question):
     try:
-        log_and_trigger_action(email, question)
+        log_and_commit_to_git(email, question)
         print("Query logged and committed to Git.")
     except Exception as e:
         print(f"Error while logging the query: {e}")
