@@ -187,7 +187,7 @@ def log_unanswered_query(email, question):
         print(f"Error while logging the query: {e}")
 
 # Streamlit app layout
-st.title("Project Synopsis QA System")
+st.title("Truck Overturning & Overspeeding Project Synopsis: QA System")
 st.write(
     "Ask questions about the project. If no answer is found, you can provide your email for follow-up, and your query will be logged."
 )
